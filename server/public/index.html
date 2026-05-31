@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construction Appointment Request</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    .container { max-width: 760px; margin: 40px auto; padding: 24px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    h1 { margin-top: 0; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    input, select, textarea { width: 100%; padding: 12px 14px; margin-bottom: 18px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 16px; }
+    button { padding: 14px 24px; border: none; border-radius: 8px; background: #1f68ff; color: white; font-size: 16px; cursor: pointer; }
+    .feedback { margin-top: 16px; font-weight: 600; }
+    .success { color: #116530; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Request an Appointment</h1>
+    <p>Please fill out the form below and click <strong>Send Request</strong>.</p>
+
+    <form id="appointment-form">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" name="fullName" required />
+
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="contactType">I am contacting as</label>
+      <select id="contactType" name="contactType" required>
+        <option value="">Select one</option>
+        <option value="personal">Personal</option>
+        <option value="company">Company</option>
+      </select>
+
+      <label for="serviceInterest">Service Interest</label>
+      <select id="serviceInterest" name="serviceInterest" required>
+        <option value="">Choose service</option>
+        <option value="general construction">General Construction</option>
+        <option value="renovations">Renovations</option>
+        <option value="design-build">Design-Build</option>
+        <option value="project management">Project Management</option>
+        <option value="consulting">Consulting</option>
+        <option value="others">Others</option>
+      </select>
+
+      <label for="others">If others, please specify</label>
+      <input type="text" id="others" name="others" placeholder="Describe any additional service request" />
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="6" required></textarea>
+
+      <button type="submit">Send Request</button>
+    </form>
+
+    <div id="feedback" class="feedback"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('appointment-form');
+    const feedback = document.getElementById('feedback');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      feedback.textContent = '';
+      feedback.className = 'feedback';
+
+      const formData = {
+        fullName: form.fullName.value.trim(),
+        email: form.email.value.trim(),
+        contactType: form.contactType.value,
+        serviceInterest: form.serviceInterest.value,
+        others: form.others.value.trim(),
+        message: form.message.value.trim(),
+      };
+
+      try {
+        const response = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          feedback.textContent = result.error || 'Unable to submit request.';
+          feedback.classList.add('error');
+          return;
+        }
+
+        feedback.textContent = 'Your request has been sent. Please check your email for confirmation.';
+        feedback.classList.add('success');
+        form.reset();
+      } catch (error) {
+        feedback.textContent = 'Network error. Please try again later.';
+        feedback.classList.add('error');
+      }
+    });
+  </script>
+</body>
+</html>
