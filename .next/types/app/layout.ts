@@ -1,4 +1,4 @@
-// File: D:\Projects\Calagero-ltd\app\layout.tsx
+// File: /workspaces/Calogero/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
