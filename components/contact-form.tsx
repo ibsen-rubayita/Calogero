@@ -19,7 +19,7 @@ export function ContactForm() {
   const [personType, setPersonType] = useState("");
   const [otherServiceText, setOtherServiceText] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const required = ["name", "email", "personType", "message", "service"];
@@ -33,14 +33,38 @@ export function ContactForm() {
     setError("");
     setLoading(true);
     const formElement = event.currentTarget;
-    window.setTimeout(() => {
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.get("name"),
+          email: form.get("email"),
+          personType: form.get("personType"),
+          message: form.get("message"),
+          service: form.get("service"),
+          serviceOther: form.get("serviceOther"),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send form");
+      }
+
       setLoading(false);
       setSent(true);
       formElement.reset();
       setServiceValue("");
       setPersonType("");
       setOtherServiceText("");
-    }, 700);
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : "Failed to send form. Please try again.");
+    }
   }
 
   return (
